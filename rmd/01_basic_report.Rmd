@@ -1,0 +1,184 @@
+---
+title: "COVID-19 Hospitalizations in Ontario, Canada"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    theme: simplex
+    toc: true
+    df_print: tibble
+    code_folding: hide
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.height = 6, fig.width = 9)
+options(scipen = 999)
+
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(janitor)
+library(lubridate)
+library(here)
+
+windowsFonts(Calibri = windowsFont("Calibri"))
+theme_set(theme_bw(base_size = 11, base_family = "Calibri") +
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+    axis.title.x.bottom = element_text(margin = margin(10, 0, 0, 0)),
+    strip.background = element_rect(colour = NA, fill = NA),
+    strip.text = element_text(size = 10)
+  )
+)
+```
+
+# Background
+This document describes the number reported COVID-19 cases that were hospitalized since 2020. Rates in this report are per 100,000 population. Changes in COVID-19 testing guidance and strategies result in under reporting of case counts. Risk of hospitalization differ across various demographic groups (i.e. distribution of hospitalizations weighted more heavily for older age groups), therefore overall counts and trends observed in this report do not not reflect the burden of hospitalizations across age, sex, or other demographic characteristics. Data caveats and limitations can be found in Public Health Ontario's [Data Tool Technical Notes](https://www.publichealthontario.ca/-/media/data-files/covid-19-data-tool-technical-notes.pdf?la=en). 
+
+Data were downloaded from Public Health Ontario's [Data Tool](https://www.publichealthontario.ca/en/data-and-analysis/infectious-disease/covid-19-data-surveillance/covid-19-data-tool?tab=trends) on **December 19, 2022**. 
+
+```{r import_proc, include = FALSE}
+d0 <- read_csv(here("data", "pho_data_tool_case_trends_2022-12-19.csv"))
+d0 <- clean_names(d0)
+
+glimpse(d0)
+
+d <- d0 %>% 
+  filter(public_health_unit == "Ontario") %>% 
+  mutate(new_date = as.Date(date, format = "%B %d, %Y")) %>% 
+  mutate(across(where(is.character), ~ifelse(. == "-", NA, .))) %>% 
+  mutate(yr = year(new_date)) %>% 
+  mutate(z = as.numeric(format(new_date, "%m%d"))) %>% 
+  group_by(yr) %>% 
+  mutate(day = row_number() + min(z) - 99) %>% 
+  ungroup() %>% 
+  mutate(day = yday(new_date)) %>% 
+  mutate(out_date = format(new_date, "%b %d")) %>% 
+  select(new_date, yr, day, out_date, matches("^cases|hosp|death")) 
+
+```
+
+# Hospitalizations in 2020
+```{r hosp_20}
+d20 <- d %>% 
+  filter(yr == 2020)
+
+d20_summary <- d20 %>% 
+  summarise(
+    min_d = min(new_date),
+    max_d = max(new_date),
+    mean_hosp_per_day = mean(hospitalizations),
+    cum_tot_hosp = sum(hospitalizations),
+    mean_hosp_rate = mean(hospitalizations_rate),
+  )
+
+fig1_alt <- "This figure contains information on COVID-19 hospitalizations in 2020 over time. The y-axis is the number of COVID-19 hospitalizations and the x-axis is date. There was a peak in April 2020 and a decline to July 2020 where hospitalizations stayed below 20 per day until mid-September where hospitalization gradually climbed into the end of the year, higher than the peak in April 2020."
+```
+There was a cumulative total of `r d20_summary$cum_tot_hosp` hospitalizations in 2020. The mean hospitalization rate per 100,000 population from `r d20_summary$min_d` to `r d20_summary$max_d`, was `r d20_summary$mean_hosp_rate`. Note the y-axis in figure below when comparing to other years.
+
+**Figure 1: COVID-19 Hospitalizations in Ontario from `r format(d20_summary$min_d, "%B %d, %Y")` `r format(d20_summary$max_d, "%B %d, %Y")`**
+```{r p20, fig.cap=fig1_alt}
+p20 <- d20 %>% 
+  ggplot(aes(x = new_date, y = hospitalizations)) +
+  geom_line(linewidth = 1.2, alpha = 0.8, colour = "#1CB2A4") +
+  scale_x_date(date_breaks = "1 month", date_labels = "%B, %Y") +
+  labs(x = "Date", y = "Hospitalizations")
+
+p20
+```
+
+
+# Hospitalizations in 2021
+```{r hosp_21}
+d21 <- d %>% 
+  filter(yr == 2021)
+
+d21_summary <- d21 %>% 
+  summarise(
+    min_d = min(new_date),
+    max_d = max(new_date),
+    mean_hosp_per_day = mean(hospitalizations),
+    cum_tot_hosp = sum(hospitalizations),
+    mean_hosp_rate = mean(hospitalizations_rate),
+  )
+
+fig2_alt <- "This figure contains information on COVID-19 hospitalizations in 2021 over time. The y-axis is the number of COVID-19 hospitalizations and the x-axis is date. There was a decline in hospitalizations from January 2021 that reached a trough and then grew to peak in mid-April 2021. Hospitalizations declined and remained low from June to August, with a minor rise in the fall of 2021. Then a rapid increase at the end of December 2021."
+```
+There was a cumulative total of `r d21_summary$cum_tot_hosp` hospitalizations in 2020. The mean hospitalization rate per 100,000 population from `r d21_summary$min_d` to `r d21_summary$max_d`, was `r d21_summary$mean_hosp_rate`. Note the y-axis in figure below when comparing to other years.
+
+**Figure 2: COVID-19 Hospitalizations in Ontario from `r format(d21_summary$min_d, "%B %d, %Y")` `r format(d21_summary$max_d, "%B %d, %Y")`**
+```{r p21, fig.cap = fig2_alt}
+p21 <- d21 %>% 
+  ggplot(aes(x = new_date, y = hospitalizations)) +
+  geom_line(linewidth = 1.2, alpha = 0.8, colour = "#351CB2") +
+  scale_x_date(date_breaks = "1 month", date_labels = "%B, %Y") +
+  labs(x = "Date", y = "Hospitalizations")
+
+p21
+```
+
+
+# Hospitalizations in 2022
+```{r hosp_22}
+d22 <- d %>% 
+  filter(yr == 2022)
+
+d22_summary <- d22 %>% 
+  summarise(
+    min_d = min(new_date),
+    max_d = max(new_date),
+    mean_hosp_per_day = mean(hospitalizations),
+    cum_tot_hosp = sum(hospitalizations),
+    mean_hosp_rate = mean(hospitalizations_rate),
+  )
+
+fig3_alt <- "This figure contains information on COVID-19 hospitalizations in 2022 over time. The y-axis is the number of COVID-19 hospitalizations and the x-axis is date. Hospitalizations peaked at over 300 per day in mid-January, then declined until March 2022. Hospitalizations grew again in April 2022 to just above 100 per day and declined again to the year low in June 2022. Hospitalizations grew and remained elevated from July to October 2022. Hospitalizations started to decline in November 2022 into December 2022."
+```
+There was a cumulative total of `r d22_summary$cum_tot_hosp` hospitalizations in 2020. The mean hospitalization rate per 100,000 population from `r d22_summary$min_d` to `r d22_summary$max_d`, was `r d22_summary$mean_hosp_rate`. Note the y-axis in figure below when comparing to other years.
+
+**Figure 3: COVID-19 Hospitalizations in Ontario from `r format(d22_summary$min_d, "%B %d, %Y")` `r format(d22_summary$max_d, "%B %d, %Y")`**
+```{r p22, fig.cap = fig3_alt}
+p22 <- d22 %>% 
+  ggplot(aes(x = new_date, y = hospitalizations)) +
+  geom_line(linewidth = 1.2, alpha = 0.8, colour = "#771CB2") +
+  scale_x_date(date_breaks = "1 month", date_labels = "%B, %Y") +
+  labs(x = "Date", y = "Hospitalizations")
+
+p22
+```
+
+
+# Yearly Comparison
+```{r comp_hosp}
+xlabs <- d %>% arrange(day) %>% 
+  distinct(day, m_lab = months(new_date, abbreviate = TRUE)) %>% 
+  group_by(m_lab) %>% 
+  summarise(day = min(day))
+
+fig4_alt <- "This figure contains information on COVID-19 hospitalizations across 2020, 2021 and 2022. The y-axis is the number of COVID-19 hospitalizations and the x-axis is date, with each line representing hospitalizations in each year. Hospitalizations peaked in the spring of each year (mid-April) and towards the end of the year (December and January). Hospitalizations were consistently higher in 2022 from the summer to fall period compared to the previous two years."
+```
+Cumulative COVID-19 case hospitalizations were highest in 2022 (despite data only up to December 19, 2022), compared to previous years. Hospitalizations peaked in the spring of each year (mid-April) and declined into the summer, except for 2022.
+
+**Figure 4: COVID-19 Hospitalizations in Ontario across 2020, 2021, and 2022**
+```{r p_compare, fig.cap = fig4_alt}
+p_comp <- d %>% 
+  ggplot(aes(x = day, y = hospitalizations, group = yr, colour = as.factor(yr))) +
+  geom_line(linewidth = 1.2, alpha = 0.75) +
+  scale_colour_manual(values = c("#351CB2", "#771CB2", "#B21C1C"), name = "Year") +
+  scale_x_continuous(breaks = xlabs$day, labels = xlabs$m_lab) +
+  theme(panel.grid.minor.x = element_blank()) +
+  labs(x = "Date", y = "Hospitalizations")
+p_comp
+```
+
+
+**R Session Information:**
+```{r session_info}
+sessionInfo()
+```
+
+
+Last Updated: **`r Sys.Date()`**
