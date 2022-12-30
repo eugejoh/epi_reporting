@@ -1,0 +1,165 @@
+---
+title: "`r ifelse(params$phu == 'Ontario', paste0('COVID-19 Hospitalizations in Ontario'), paste0('COVID-19 Hospitalizations in Ontario: ', params$phu))`"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    theme: simplex
+    number_sections: true
+    toc: true
+    df_print: tibble
+    code_folding: hide
+editor_options: 
+  chunk_output_type: console
+params:
+  phu: "Ontario"
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.height = 6, fig.width = 9)
+options(scipen = 999)
+
+windowsFonts(Calibri = windowsFont("Calibri"))
+theme_set(theme_bw(base_size = 11, base_family = "Calibri") +
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+    axis.title.x.bottom = element_text(margin = margin(10, 0, 0, 0)),
+    strip.background = element_rect(colour = NA, fill = NA),
+    strip.text = element_text(size = 10)
+  )
+)
+
+d_rmd <- d %>% 
+  filter(public_health_unit == params$phu)
+```
+
+# Background
+This document describes the number reported COVID-19 cases that were hospitalized since 2020 in `r ifelse(params$phu == 'Ontario', paste0('Ontario'), paste0(params$phu, ', Ontario'))`. Rates in this report are per 100,000 population. Changes in COVID-19 testing guidance and strategies result in under reporting of case counts. Risk of hospitalization differ across various demographic groups (i.e. distribution of hospitalizations weighted more heavily for older age groups), therefore overall counts and trends observed in this report do not accurately reflect the burden of hospitalizations across age, sex, or other demographic characteristics. Data caveats and limitations can be found in Public Health Ontario's [Data Tool Technical Notes](https://www.publichealthontario.ca/-/media/data-files/covid-19-data-tool-technical-notes.pdf?la=en). 
+
+Data were downloaded from Public Health Ontario's [Data Tool](https://www.publichealthontario.ca/en/data-and-analysis/infectious-disease/covid-19-data-surveillance/covid-19-data-tool?tab=trends) on **December 19, 2022**. 
+
+# Hospitalizations reported from `r params$phu` in 2020
+```{r hosp_20}
+d20 <- d_rmd %>% 
+  filter(yr == 2020)
+
+d20_summary <- d20 %>% 
+  summarise(
+    min_d = min(new_date),
+    max_d = max(new_date),
+    mean_hosp_per_day = mean(hospitalizations),
+    cum_tot_hosp = sum(hospitalizations),
+    mean_hosp_rate = mean(hospitalizations_rate),
+  )
+
+fig1_alt <- paste0("This figure contains information on COVID-19 hospitalizations in 2020 over time in ", params$phu, ". The y-axis is the number of COVID-19 hospitalizations and the x-axis is date.")
+```
+There was a cumulative total of `r d20_summary$cum_tot_hosp` hospitalizations in 2020. The mean hospitalization rate per 100,000 population from `r d20_summary$min_d` to `r d20_summary$max_d`, was `r d20_summary$mean_hosp_rate`. Note the y-axis in figure below when comparing to other years.
+
+**Figure 1: COVID-19 Hospitalizations in `r params$phu` from `r format(d20_summary$min_d, "%B %d, %Y")` `r format(d20_summary$max_d, "%B %d, %Y")`**
+```{r p20, fig.cap=fig1_alt}
+p20 <- d20 %>% 
+  ggplot(aes(x = new_date, y = hospitalizations)) +
+  geom_line(linewidth = 1.2, alpha = 0.8, colour = "#351CB2") +
+  scale_x_date(date_breaks = "1 month", date_labels = "%B, %Y") +
+  labs(x = "Date", y = "Hospitalizations")
+
+p20
+```
+
+
+# Hospitalizations reported from `r params$phu` in 2021
+```{r hosp_21}
+d21 <- d_rmd %>% 
+  filter(yr == 2021)
+
+d21_summary <- d21 %>% 
+  summarise(
+    min_d = min(new_date),
+    max_d = max(new_date),
+    mean_hosp_per_day = mean(hospitalizations),
+    cum_tot_hosp = sum(hospitalizations),
+    mean_hosp_rate = mean(hospitalizations_rate),
+  )
+
+fig2_alt <- paste0("This figure contains information on COVID-19 hospitalizations in 2021 over time in .", params$phu, " The y-axis is the number of COVID-19 hospitalizations and the x-axis is date.")
+```
+There was a cumulative total of `r d21_summary$cum_tot_hosp` hospitalizations in 2020. The mean hospitalization rate per 100,000 population from `r d21_summary$min_d` to `r d21_summary$max_d`, was `r d21_summary$mean_hosp_rate`. Note the y-axis in figure below when comparing to other years.
+
+**Figure 2: COVID-19 Hospitalizations in `r params$phu` from `r format(d21_summary$min_d, "%B %d, %Y")` `r format(d21_summary$max_d, "%B %d, %Y")`**
+```{r p21, fig.cap = fig2_alt}
+p21 <- d21 %>% 
+  ggplot(aes(x = new_date, y = hospitalizations)) +
+  geom_line(linewidth = 1.2, alpha = 0.8, colour = "#771CB2") +
+  scale_x_date(date_breaks = "1 month", date_labels = "%B, %Y") +
+  labs(x = "Date", y = "Hospitalizations")
+
+p21
+```
+
+
+# Hospitalizations reported from `r params$phu` in 2022
+```{r hosp_22}
+d22 <- d_rmd %>% 
+  filter(yr == 2022)
+
+d22_summary <- d22 %>% 
+  summarise(
+    min_d = min(new_date),
+    max_d = max(new_date),
+    mean_hosp_per_day = mean(hospitalizations),
+    cum_tot_hosp = sum(hospitalizations),
+    mean_hosp_rate = mean(hospitalizations_rate),
+  )
+
+fig3_alt <- paste0("This figure contains information on COVID-19 hospitalizations in 2022 over time in .", params$phu, " The y-axis is the number of COVID-19 hospitalizations and the x-axis is date.")
+```
+There was a cumulative total of `r d22_summary$cum_tot_hosp` hospitalizations in 2020. The mean hospitalization rate per 100,000 population from `r d22_summary$min_d` to `r d22_summary$max_d`, was `r d22_summary$mean_hosp_rate`. Note the y-axis in figure below when comparing to other years.
+
+**Figure 3: COVID-19 Hospitalizations in `r params$phu` from `r format(d22_summary$min_d, "%B %d, %Y")` `r format(d22_summary$max_d, "%B %d, %Y")`**
+```{r p22, fig.cap = fig3_alt}
+p22 <- d22 %>% 
+  ggplot(aes(x = new_date, y = hospitalizations)) +
+  geom_line(linewidth = 1.2, alpha = 0.8, colour = "#B21C1C") +
+  scale_x_date(date_breaks = "1 month", date_labels = "%B, %Y") +
+  labs(x = "Date", y = "Hospitalizations")
+
+p22
+```
+
+
+# Yearly Comparison
+```{r comp_hosp}
+xlabs <- d_rmd %>% arrange(day) %>% 
+  distinct(day, m_lab = months(new_date, abbreviate = TRUE)) %>% 
+  group_by(m_lab) %>% 
+  summarise(day = min(day))
+
+fig4_alt <- paste0("This figure contains information on COVID-19 hospitalizations across 2020, 2021 and 2022 in ", params$phu, ". The y-axis is the number of COVID-19 hospitalizations and the x-axis is date, with each line representing hospitalizations in each year.")
+```
+
+**Figure 4: COVID-19 Hospitalizations in `r params$phu`` across 2020, 2021, and 2022**
+```{r p_compare, fig.cap = fig4_alt}
+p_comp <- d_rmd %>% 
+  ggplot(aes(x = day, y = hospitalizations, group = yr, colour = as.factor(yr))) +
+  geom_line(linewidth = 1.2, alpha = 0.75) +
+  scale_colour_manual(values = c("#351CB2", "#771CB2", "#B21C1C"), name = "Year") +
+  scale_x_continuous(breaks = xlabs$day, labels = xlabs$m_lab) +
+  theme(panel.grid.minor.x = element_blank()) +
+  labs(x = "Date", y = "Hospitalizations")
+p_comp
+```
+
+
+# Appendix: R Code
+```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
+```
+
+
+**R Session Information:**
+```{r session_info, echo = TRUE}
+sessionInfo()
+```
+
+
+Last Updated: **`r Sys.Date()`**
