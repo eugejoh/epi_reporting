@@ -9,7 +9,7 @@ library(here)
 render(
   input = here("rmd", "01_basic_report.rmd"),
   output_format = "html_document",
-  output_file = paste0("01_basic_report_", Sys.Date()),
+  output_file = paste0("COVID_hosp_ON_", Sys.Date()),
   output_dir = here("rmd_output"),
   clean = TRUE,
   quiet = FALSE,
