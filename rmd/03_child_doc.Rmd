@@ -1,0 +1,36 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+## `r paste0("COVID-19 Cases: ", j)`
+```{r include = TRUE, warning=FALSE}
+z %>% 
+  filter(public_health_unit == j) %>% 
+  ggplot(aes(x = new_date, y = cases_rate_by_reported_date)) +
+  geom_col(fill = "#1C75B2") +
+  scale_x_date(limits = c(min(x_brks), max(x_brks)), date_breaks = "1 month", date_labels = "%B, %Y") +
+  labs(x = "Date", y = "Daily Cases")
+```
+
+## `r paste0("COVID-19 Hospitalizations: ",j)`
+```{r include = TRUE, warning=FALSE}
+z %>% 
+  filter(public_health_unit == j) %>% 
+  ggplot(aes(x = new_date, y = hospitalizations)) +
+  geom_col(fill = "#B24E1C") +
+  scale_x_date(limits = c(min(x_brks), max(x_brks)), date_breaks = "1 month", date_labels = "%B, %Y") +
+  labs(x = "Date", y = "Daily Hospitalization")
+```
+
+## `r paste0("COVID-19 Deaths: ",j)`
+```{r include = TRUE, warning=FALSE}
+z %>% 
+  filter(public_health_unit == j) %>% 
+  ggplot(aes(x = new_date, y = deaths)) +
+  geom_col(fill = "#B21C67") +
+  scale_x_date(limits = c(min(x_brks), max(x_brks)), date_breaks = "1 month", date_labels = "%B, %Y") +
+  labs(x = "Date", y = "Daily Deaths")
+```
+
+\n

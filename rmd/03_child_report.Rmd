@@ -1,0 +1,68 @@
+---
+title: "COVID-19 Cases, Hospitlizations, and Deaths in ONtario"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    theme: simplex
+    number_sections: true
+    toc: true
+    df_print: tibble
+    code_folding: hide
+editor_options: 
+  chunk_output_type: console
+params:
+  yr: 2020
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.height = 6, fig.width = 9)
+options(scipen = 999)
+
+windowsFonts(Calibri = windowsFont("Calibri"))
+theme_set(theme_bw(base_size = 11, base_family = "Calibri") +
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+    axis.title.x.bottom = element_text(margin = margin(10, 0, 0, 0)),
+    strip.background = element_rect(colour = NA, fill = NA),
+    strip.text = element_text(size = 10)
+  )
+)
+```
+
+# Background
+This document describes the number reported COVID-19 cases, hospitalizations, and deaths since 2020 in Ontario. Rates in this report are per 100,000 population. Changes in COVID-19 testing guidance and strategies throughout the pandemic have resulted in under reporting of case counts. Risk of severe outcomes (hospitalization and death) differ across various demographic groups (i.e. distribution of hospitalizations weighted more heavily for older age groups), therefore overall counts and trends observed in this report do not accurately reflect the burden of these outcomes across age, sex, or other demographic characteristics. Data caveats and limitations can be found in Public Health Ontario's [Data Tool Technical Notes](https://www.publichealthontario.ca/-/media/data-files/covid-19-data-tool-technical-notes.pdf?la=en).  
+
+Data were downloaded from Public Health Ontario's [Data Tool](https://www.publichealthontario.ca/en/data-and-analysis/infectious-disease/covid-19-data-surveillance/covid-19-data-tool?tab=trends) on **December 19, 2022**.  
+
+```{r filter_d}
+z <- d %>% 
+  filter(yr == params$yr)
+
+x_brks <- unique(z$new_date)
+
+```
+
+
+```{r all_figs, results = 'asis'}
+for (j in unique(d$public_health_unit)[-1]) { 
+  cat("# ", j, "{.tabset}",
+      knitr::knit_child(input = file.path(wd,"rmd", "03_child_doc.rmd"), quiet = TRUE),
+      "\n\n"
+      )
+}
+```
+
+
+# Appendix: R Code
+```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
+```
+
+
+**R Session Information:**
+```{r session_info, echo = TRUE}
+sessionInfo()
+```
+
+
+Last Updated: **`r Sys.Date()`**
