@@ -145,6 +145,7 @@ p22 <- d22 %>%
   ggplot(aes(x = new_date, y = hospitalizations)) +
   geom_line(linewidth = 1.2, alpha = 0.8, colour = "#B21C1C") +
   scale_x_date(date_breaks = "1 month", date_labels = "%B, %Y") +
+  scale_y_continuous(limits = c(0, NA),expand = c(0,0)) +
   labs(x = "Date", y = "Hospitalizations")
 
 p22
@@ -168,7 +169,7 @@ p_comp <- d %>%
   ggplot(aes(x = day, y = hospitalizations, group = yr, colour = as.factor(yr))) +
   geom_line(linewidth = 1.2, alpha = 0.75) +
   scale_colour_manual(values = c("#351CB2", "#771CB2", "#B21C1C"), name = "Year") +
-  scale_x_continuous(breaks = xlabs$day, labels = xlabs$m_lab) +
+  scale_x_continuous(breaks = xlabs$day, labels = xlabs$m_lab, expand = c(0,0)) +
   theme(panel.grid.minor.x = element_blank()) +
   labs(x = "Date", y = "Hospitalizations")
 p_comp

@@ -10,6 +10,7 @@ z %>%
   ggplot(aes(x = new_date, y = cases_rate_by_reported_date)) +
   geom_col(fill = "#1C75B2") +
   scale_x_date(limits = c(min(x_brks), max(x_brks)), date_breaks = "1 month", date_labels = "%B, %Y") +
+  scale_y_continuous(limits = c(0, NA),expand = c(0,0)) +
   labs(x = "Date", y = "Daily Cases")
 ```
 
@@ -20,6 +21,7 @@ z %>%
   ggplot(aes(x = new_date, y = hospitalizations)) +
   geom_col(fill = "#B24E1C") +
   scale_x_date(limits = c(min(x_brks), max(x_brks)), date_breaks = "1 month", date_labels = "%B, %Y") +
+  scale_y_continuous(limits = c(0, NA),expand = c(0,0)) +
   labs(x = "Date", y = "Daily Hospitalization")
 ```
 
@@ -30,6 +32,7 @@ z %>%
   ggplot(aes(x = new_date, y = deaths)) +
   geom_col(fill = "#B21C67") +
   scale_x_date(limits = c(min(x_brks), max(x_brks)), date_breaks = "1 month", date_labels = "%B, %Y") +
+  scale_y_continuous(limits = c(0, NA),expand = c(0,0)) +
   labs(x = "Date", y = "Daily Deaths")
 ```
 
